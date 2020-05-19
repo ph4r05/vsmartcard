@@ -39,7 +39,7 @@ install:
  #- set VSVER=14
  #- ps: $env:VSCOMNTOOLS=(Get-Content ("env:VS" + "$env:VSVER" + "0COMNTOOLS"))
  #- echo "Using Visual Studio %VSVER%.0 at %VSCOMNTOOLS%"
- #- call "%VSCOMNTOOLS%\..\..\VC\vcvarsall.bat" %VCVARS_PLATFORM%
+ - call "%VS140COMNTOOLS%/../../VC/vcvarsall.bat" %VCVARS_PLATFORM%
 
 build_script:
  - md %ARTIFACT%
