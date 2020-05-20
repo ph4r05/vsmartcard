@@ -4,10 +4,11 @@ platform:
 
 environment:
  matrix:
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    BUILD: vicc
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    BUILD: vpcd
+  #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  #BUILD: vicc
+  # the appropriate windows sdk currently not installed
+  #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+  #BUILD: vpcd
   - BUILD: ACardEmulator
 
 install:
