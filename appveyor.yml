@@ -57,7 +57,7 @@ install:
 build_script:
  - md %ARTIFACT%
 
- - ps: >-
+ - ps:
     If ($env:BUILD -Match "vpcd") {
      msbuild virtualsmartcard\win32\BixVReader.sln /p:Configuration=Release;Platform=$env:MSBUILD_PLATFORM
      move virtualsmartcard\win32\BixVReaderInstaller\bin\${env:X64}Release\BixVReaderInstaller.msi $env:ARTIFACT
@@ -65,7 +65,7 @@ build_script:
      move vpcd-config.exe $env:ARTIFACT
     }
 
- - ps: >-
+ - ps:
     If ($env:BUILD -Match "virtualsmartcard") {
      bash -c "cd virtualsmartcard && autoreconf -i && exec 0</dev/null ./configure --enable-libpcsclite HELP2MAN=/usr/bin/true"
      bash -c "make vicc -C virtualsmartcard/src/vpicc"
