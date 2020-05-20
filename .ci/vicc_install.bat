@@ -13,6 +13,5 @@ pip install pyscard || goto :err
 pip install pyinstaller || goto :err
 set PATH="C:\cygwin\bin;%PATH%" || goto :err
 
-goto :EOF
 :err
 exit /b %errorlevel%
