@@ -1,11 +1,15 @@
-choco install swig
-python -m pip install --upgrade pip
-pip install virtualenv
-pip install -U setuptools
-easy_install PyCrypto
-pip install pbkdf2
-pip install Pillow
-pip install pyreadline
-pip install pyscard
-pip install pyinstaller
-set PATH="C:\cygwin\bin;%PATH%"
+choco install swig || goto :err
+python -m pip install --upgrade pip || goto :err
+pip install virtualenv || goto :err
+pip install -U setuptools || goto :err
+easy_install PyCrypto || goto :err
+pip install pbkdf2 || goto :err
+pip install Pillow || goto :err
+pip install pyreadline || goto :err
+pip install pyscard || goto :err
+pip install pyinstaller || goto :err
+set PATH="C:\cygwin\bin;%PATH%" || goto :err
+
+goto :EOF
+:err
+exit /b %errorlevel%
