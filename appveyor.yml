@@ -10,6 +10,8 @@ environment:
     BUILD: vpcd
 
 install:
+ - git submodule update --init --recursive
+
  - ps: >-
      If ($env:Platform -Match "x86") {
        $env:MSBUILD_PLATFORM="x86"
@@ -22,12 +24,8 @@ install:
        $env:ARTIFACT="${env:BUILD}_win64"
        $env:X64="x64\"
      }
- - git submodule update --init --recursive
- 
- # BUGFIX: wdf directory was renamed to 00wdf, rename it back (see github.com/appveyor/ci/issues/414)
- #- ps: ren 'C:\Program Files (x86)\Windows Kits\10\include\00wdf' 'wdf'
 
- - ps: >-
+ - ps: |
     If ($env:BUILD -Match "virtualsmartcard") {
      choco install swig
      python -m pip install --upgrade pip
