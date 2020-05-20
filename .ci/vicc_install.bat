@@ -1,3 +1,4 @@
+git submodule update --init --recursive || goto :err
 choco install swig || goto :err
 python -m pip install --upgrade pip || goto :err
 pip install virtualenv || goto :err

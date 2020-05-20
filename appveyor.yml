@@ -10,8 +10,6 @@ environment:
     BUILD: vpcd
 
 install:
- - git submodule update --init --recursive
-
  - ps: >-
      If ($env:Platform -Match "x86") {
        $env:MSBUILD_PLATFORM="x86"
