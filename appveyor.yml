@@ -2,20 +2,24 @@ platform:
  - x86
  - x64
 
-os: Visual Studio 2015
+environment:
+ matrix:
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    BUILD: virtualsmartcard
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    BUILD: vpcd
 
 install:
- - date /T & time /T
  - ps: >-
      If ($env:Platform -Match "x86") {
        $env:MSBUILD_PLATFORM="x86"
        $env:VCVARS_PLATFORM="x86"
-       $env:ARTIFACT="virtualsmartcard_win32"
+       $env:ARTIFACT="${env:BUILD}_win32"
        $env:X64=""
      } Else {
        $env:MSBUILD_PLATFORM="x64"
        $env:VCVARS_PLATFORM="amd64"
-       $env:ARTIFACT="virtualsmartcard_win64"
+       $env:ARTIFACT="${env:BUILD}_win64"
        $env:X64="x64\"
      }
  - git submodule update --init --recursive
@@ -23,36 +27,50 @@ install:
  # BUGFIX: wdf directory was renamed to 00wdf, rename it back (see github.com/appveyor/ci/issues/414)
  #- ps: ren 'C:\Program Files (x86)\Windows Kits\10\include\00wdf' 'wdf'
 
- - choco install swig
- - python -m pip install --upgrade pip
- - pip install virtualenv
- - pip install -U setuptools
- - easy_install PyCrypto
- - pip install pbkdf2
- - pip install Pillow
- - pip install pyreadline
- - pip install pyscard
- - pip install pyinstaller
- - set PATH=C:\cygwin\bin;%PATH%
+ - ps: >-
+    If ($env:BUILD -Match "virtualsmartcard") {
+     choco install swig
+     python -m pip install --upgrade pip
+     pip install virtualenv
+     pip install -U setuptools
+     easy_install PyCrypto
+     pip install pbkdf2
+     pip install Pillow
+     pip install pyreadline
+     pip install pyscard
+     pip install pyinstaller
+     $env:PATH="C:\cygwin\bin;${env:PATH}"
+    }
 
- # set Visual Studio 2015 build environment
- #- set VSVER=14
- #- ps: $env:VSCOMNTOOLS=(Get-Content ("env:VS" + "$env:VSVER" + "0COMNTOOLS"))
- #- echo "Using Visual Studio %VSVER%.0 at %VSCOMNTOOLS%"
- - call "%VS140COMNTOOLS%/../../VC/vcvarsall.bat" %VCVARS_PLATFORM%
+ - ps: >-
+     If ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019") {
+       $env:VCVARSALL="${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
+     } ElseIf ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") {
+       $env:VCVARSALL="${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
+     } ElseIf ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") {
+       $env:VCVARSALL="${env:VS140COMNTOOLS}\..\..\VC\vcvarsall.bat"
+     } ElseIf ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2013") {
+       $env:VCVARSALL="${env:VS121COMNTOOLS}\..\..\VC\vcvarsall.bat"
+     }
+ - call "%VCVARSALL%" %VCVARS_PLATFORM%
 
 build_script:
  - md %ARTIFACT%
 
- #- msbuild virtualsmartcard\win32\BixVReader.sln /p:Configuration=Release;Platform=%MSBUILD_PLATFORM%
- #- move    virtualsmartcard\win32\BixVReaderInstaller\bin\%X64%Release\BixVReaderInstaller.msi %ARTIFACT%
+ - ps: >-
+    If ($env:BUILD -Match "vpcd") {
+     msbuild virtualsmartcard\win32\BixVReader.sln /p:Configuration=Release;Platform=%MSBUILD_PLATFORM%
+     move virtualsmartcard\win32\BixVReaderInstaller\bin\%X64%Release\BixVReaderInstaller.msi %ARTIFACT%
+     cl /Ivirtualsmartcard\src\vpcd virtualsmartcard\src\vpcd-config\vpcd-config.c /NODEFAULTLIB:MSVCRTD  /NODEFAULTLIB:MSVCRT virtualsmartcard\src\vpcd-config\local-ip.c ws2_32.lib
+     move vpcd-config.exe %ARTIFACT%
+    }
 
- - cl /Ivirtualsmartcard\src\vpcd virtualsmartcard\src\vpcd-config\vpcd-config.c /NODEFAULTLIB:MSVCRTD  /NODEFAULTLIB:MSVCRT virtualsmartcard\src\vpcd-config\local-ip.c ws2_32.lib
- - move    vpcd-config.exe %ARTIFACT%
-
- - bash -c "cd virtualsmartcard && autoreconf -i && exec 0</dev/null ./configure --enable-libpcsclite HELP2MAN=/usr/bin/true"
- - bash -c "make vicc -C virtualsmartcard/src/vpicc"
- - pyinstaller --onefile virtualsmartcard\src\vpicc\vicc -i doc\_static\chip.ico --distpath %ARTIFACT%
+ - ps: >-
+    If ($env:BUILD -Match "virtualsmartcard") {
+     bash -c "cd virtualsmartcard && autoreconf -i && exec 0</dev/null ./configure --enable-libpcsclite HELP2MAN=/usr/bin/true"
+     bash -c "make vicc -C virtualsmartcard/src/vpicc"
+     pyinstaller --onefile virtualsmartcard\src\vpicc\vicc -i doc\_static\chip.ico --distpath %ARTIFACT%
+    }
 
  - 7z a %ARTIFACT%.zip %ARTIFACT%
  - appveyor PushArtifact %ARTIFACT%.zip
