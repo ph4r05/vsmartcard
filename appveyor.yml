@@ -34,12 +34,12 @@ install:
        $env:VCVARSALL="${env:VS121COMNTOOLS}\..\..\VC\vcvarsall.bat"
      }
 
- - call ".ci\\%BUILD%_install"
+ - call ".ci\\%BUILD%_install.bat"
 
 build_script:
  - md %ARTIFACT%
 
- - call ".ci\\%BUILD%_build"
+ - call ".ci\\%BUILD%_build.bat"
 
  - 7z a %ARTIFACT%.zip %ARTIFACT%
  - appveyor PushArtifact %ARTIFACT%.zip
