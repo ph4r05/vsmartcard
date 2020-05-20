@@ -10,6 +10,7 @@ environment:
   #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
   #BUILD: vpcd
   - BUILD: ACardEmulator
+    APPVEYOR_BUILD_WORKER_IMAGE: Previous Visual Studio 2017
 
 install:
  - ps: >-
