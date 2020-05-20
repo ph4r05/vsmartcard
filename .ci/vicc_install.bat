@@ -11,7 +11,7 @@ pip install Pillow || goto :err
 pip install pyreadline || goto :err
 pip install pyscard || goto :err
 pip install pyinstaller || goto :err
-set PATH="C:\cygwin\bin;%PATH%" || goto :err
+set PATH=%PATH%;C:\cygwin\bin || goto :err
 
 :err
 exit /b %errorlevel%
