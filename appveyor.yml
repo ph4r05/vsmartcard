@@ -5,7 +5,7 @@ platform:
 environment:
  matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    BUILD: virtualsmartcard
+    BUILD: vicc
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     BUILD: vpcd
 
@@ -25,21 +25,6 @@ install:
        $env:X64="x64\"
      }
 
- - ps: |
-    If ($env:BUILD -Match "virtualsmartcard") {
-     choco install swig
-     python -m pip install --upgrade pip
-     pip install virtualenv
-     pip install -U setuptools
-     easy_install PyCrypto
-     pip install pbkdf2
-     pip install Pillow
-     pip install pyreadline
-     pip install pyscard
-     pip install pyinstaller
-     $env:PATH="C:\cygwin\bin;${env:PATH}"
-    }
-
  - ps: >-
      If ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2019") {
        $env:VCVARSALL="${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat"
@@ -50,25 +35,13 @@ install:
      } ElseIf ($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2013") {
        $env:VCVARSALL="${env:VS121COMNTOOLS}\..\..\VC\vcvarsall.bat"
      }
- - call "%VCVARSALL%" %VCVARS_PLATFORM%
+
+ - call ".ci\\%BUILD%_install"
 
 build_script:
  - md %ARTIFACT%
 
- - ps:
-    If ($env:BUILD -Match "vpcd") {
-     msbuild virtualsmartcard\win32\BixVReader.sln /p:Configuration=Release;Platform=$env:MSBUILD_PLATFORM
-     move virtualsmartcard\win32\BixVReaderInstaller\bin\${env:X64}Release\BixVReaderInstaller.msi $env:ARTIFACT
-     cl /Ivirtualsmartcard\src\vpcd virtualsmartcard\src\vpcd-config\vpcd-config.c /NODEFAULTLIB:MSVCRTD  /NODEFAULTLIB:MSVCRT virtualsmartcard\src\vpcd-config\local-ip.c ws2_32.lib
-     move vpcd-config.exe $env:ARTIFACT
-    }
-
- - ps:
-    If ($env:BUILD -Match "virtualsmartcard") {
-     bash -c "cd virtualsmartcard && autoreconf -i && exec 0</dev/null ./configure --enable-libpcsclite HELP2MAN=/usr/bin/true"
-     bash -c "make vicc -C virtualsmartcard/src/vpicc"
-     pyinstaller --onefile virtualsmartcard\src\vpicc\vicc -i doc\_static\chip.ico --distpath $env:ARTIFACT
-    }
+ - call ".ci\\%BUILD%_build"
 
  - 7z a %ARTIFACT%.zip %ARTIFACT%
  - appveyor PushArtifact %ARTIFACT%.zip
