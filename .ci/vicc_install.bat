@@ -1,5 +1,6 @@
 @echo on
 
+setx /M PATH "%PATH%;C:\cygwin\bin"
 git submodule update --init --recursive || goto :err
 choco install swig || goto :err
 python -m pip install --upgrade pip || goto :err
@@ -11,7 +12,6 @@ pip install Pillow || goto :err
 pip install pyreadline || goto :err
 pip install pyscard || goto :err
 pip install pyinstaller || goto :err
-set PATH=%PATH%;C:\cygwin\bin || goto :err
 
 :err
 exit /b %errorlevel%
