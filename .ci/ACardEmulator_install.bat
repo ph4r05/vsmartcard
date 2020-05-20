@@ -1,7 +1,7 @@
 @echo on
 
 pushd ACardEmulator
-gradlew.bat --version
+call gradlew.bat --version || goto :err
 popd
 
 :err
