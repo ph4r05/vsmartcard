@@ -71,7 +71,7 @@ AC_ARG_ENABLE(libpcsclite,
 if test "${libpcsclite}" = no ; then
 	PKG_CHECK_EXISTS([libpcsclite],
 					 [PKG_CHECK_MODULES([PCSC], [libpcsclite])],
-					 [AC_MSG_WARN([libpcsclite not found by pkg-config])
+					 [AC_MSG_WARN([libpcsclite not found by pkg-config host: $host])
 					 case "$host" in
 						 *-*-darwin*)
 							SDKS_PATH="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs"
@@ -86,7 +86,7 @@ if test "${libpcsclite}" = no ; then
 	saved_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $PCSC_CFLAGS"
 	AC_CHECK_HEADERS(ifdhandler.h,,
-			[ AC_MSG_ERROR([ifdhandler.h not found, install libpcsclite or use ./configure PCSC_CFLAGS=...])], [#include <wintypes.h>])
+			[ AC_MSG_ERROR([ifdhandler.h not found, install libpcsclite or use ./configure PCSC_CFLAGS=..., current CPPFLAGS=$CPPFLAGS])], [#include <wintypes.h>])
 	AC_CHECK_HEADERS([debuglog.h])
 	CPPFLAGS="$saved_CPPFLAGS"
 
