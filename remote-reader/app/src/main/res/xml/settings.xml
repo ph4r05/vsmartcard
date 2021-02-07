@@ -52,7 +52,7 @@
 
         <ListPreference
             android:key="timeout"
-            android:defaultValue="500"
+            android:defaultValue="10000"
             android:title="Delay for Card Response"
             android:entries="@array/strTimeouts"
             android:entryValues="@array/intTimeouts" />
