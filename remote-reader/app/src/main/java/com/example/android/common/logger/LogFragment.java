@@ -35,6 +35,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,8 +70,8 @@ public class LogFragment extends Fragment {
         mLogView.setFocusable(true);
         mLogView.setTypeface(Typeface.MONOSPACE);
 
-        // Want to set padding as 16 dips, setPadding takes pixels.  Hooray math!
-        int paddingDips = 16;
+        // Want to set padding as 12 dips, setPadding takes pixels.  Hooray math!
+        int paddingDips = 12;
         double scale = getResources().getDisplayMetrics().density;
         int paddingPixels = (int) ((paddingDips * (scale)) + .5);
         mLogView.setPadding(paddingPixels, paddingPixels, paddingPixels, paddingPixels);
@@ -78,6 +79,7 @@ public class LogFragment extends Fragment {
 
         mLogView.setGravity(Gravity.BOTTOM);
         mLogView.setTextAppearance(getActivity(), android.R.style.TextAppearance_Holo_Medium);
+        mLogView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
 
         mScrollView.addView(mLogView);
         return mScrollView;
